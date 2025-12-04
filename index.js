@@ -56,7 +56,7 @@ async function run() {
 
     app.get('/foods', async (req, res) => {
       try {
-        const result = await foodcollection.find({ status: 'In Stock' }).sort({ price: -1 }).toArray()
+        const result = await foodcollection.find({ status: 'In Stock' }).sort({price: -1, createdAt: -1 }).toArray()
         res.status(200).send(result)
 
       } catch (error) {
