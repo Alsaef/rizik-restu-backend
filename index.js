@@ -5,7 +5,8 @@ var cors = require('cors')
 require('dotenv').config()
 const allowedOrigins = [
   'http://localhost:3000',
-  'http://localhost:5173'
+  'http://localhost:5173',
+  'https://rizik-restaurant.vercel.app'
 ];
 
 const corsOptions = {
