@@ -67,6 +67,19 @@ async function run() {
     })
 
 
+     app.get('/foods-latest', async (req, res) => {
+      try {
+        const result = await foodcollection.find({ status: 'In Stock' }).sort({ createdAt: -1 }).toArray()
+        res.status(200).send(result)
+
+      } catch (error) {
+        console.log(error.message);
+        res.status(500).send(error.message)
+      }
+
+    })
+
+
 
     app.post('/foods', async (req, res) => {
       try {
