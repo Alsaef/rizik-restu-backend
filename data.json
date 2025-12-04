@@ -1,0 +1,9 @@
+ [
+    { "category": "Lunch", "name": "সাদা ভাত (প্রতি প্লেট)", "price": 20, "desc": "পরিমাণ মতো ধোঁয়া ওঠা সুগন্ধি সাদা ভাত।", "image": "https://i.ibb.co/QvJd97Tb/boter-dal-withgoru.jpg", "status": "In Stock" },
+    
+    { "category": "Evening", "name": "চালের রুটি (প্রতি পিস)", "price": 15, "desc": "ফ্রেশ তৈরি নরম ও সুস্বাদু চালের রুটি।", "image": "https://i.ibb.co/QvJd97Tb/boter-dal-withgoru.jpg", "status": "In Stock" },
+   
+    { "category": "Dinner", "name": "গরুর খিচুড়ি (লেটা/ভুনা)", "price": 170, "desc": "গরুর মাংস সহ মশলাদার লেটা/ভুনা খিচুড়ি।", "image":"https://i.ibb.co/QvJd97Tb/boter-dal-withgoru.jpg", "status": "In Stock" },
+    
+    { "category": "Dessert", "name": "দই", "price": 30, "desc": "ঠান্ডা ও সুস্বাদু মিষ্টি দই।", "image": "https://i.ibb.co/QvJd97Tb/boter-dal-withgoru.jpg", "status": "In Stock" }
+ ]
