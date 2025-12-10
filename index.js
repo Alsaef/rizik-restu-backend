@@ -53,7 +53,7 @@ async function run() {
     const foodcollection = DB.collection('foods')
     const userCollection = DB.collection('users')
     const categoryCollection = DB.collection('category')
-
+    const servicesCollection=DB.collection('services')
     app.get('/foods', async (req, res) => {
       try {
         const result = await foodcollection.find({ status: 'In Stock' }).sort({price: -1, createdAt: -1 }).toArray()
@@ -374,6 +374,26 @@ async function run() {
       }
     });
 
+    app.get('/services',async(req,res)=>{
+       
+       const result=await servicesCollection.find().toArray()
+       if (!result) {
+        return res.status(404).send({message:"services not found"})
+       }
+       res.status(200).send(result)
+    })
+
+       app.get('/services/:id',async(req,res)=>{
+       const {id}=req.params
+       if (!id) {
+        return res.status(404).send({message:"id not found"})
+       }
+       const result=await servicesCollection.findOne({_id:new ObjectId(id)})
+       if (!result) {
+        return res.status(404).send({message:"services not found"})
+       }
+       res.status(200).send(result)
+    })
 
 
 
