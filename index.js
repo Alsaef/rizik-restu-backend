@@ -31,7 +31,7 @@ app.use(express.json())
 
 
 const { MongoClient, ServerApiVersion, Db, ObjectId } = require('mongodb');
-const uri = `mongodb+srv://${process.env.DB}:${process.env.password}@cluster0.lc3nzq5.mongodb.net/?appName=Cluster0`;
+const uri = `mongodb+srv://${process.env.DB}:${process.env.password}@cluster0.ng93ysh.mongodb.net/?appName=Cluster0`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
@@ -65,7 +65,6 @@ async function run() {
       }
 
     })
-
 
      app.get('/foods-latest', async (req, res) => {
       try {
