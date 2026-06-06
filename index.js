@@ -259,6 +259,10 @@ async function run() {
           return res.status(403).send({ message: 'Access denied' });
         }
 
+        if (!email) {
+          return res.status(400).send({ message: 'Email is required' });
+        }
+
         res.status(200).send({ role: 'admin' });
 
       } catch (error) {
