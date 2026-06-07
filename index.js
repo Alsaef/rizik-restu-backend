@@ -7,7 +7,8 @@ const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:5173',
   'https://rizik-restaurant.vercel.app',
-  'https://rizik-dashboard.vercel.app'
+  'https://rizik-dashboard.vercel.app',
+  "https://www.rizikrestaurant.com"
 ];
 
 const corsOptions = {
