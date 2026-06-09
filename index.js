@@ -52,12 +52,13 @@ async function run() {
 
     const DB = client.db('rizik-resturant-DB')
     const foodcollection = DB.collection('foods')
+    const foodcollectionTwo = DB.collection('foodsTwo')
     const userCollection = DB.collection('users')
     const categoryCollection = DB.collection('category')
     const servicesCollection=DB.collection('services')
     app.get('/foods', async (req, res) => {
       try {
-        const result = await foodcollection.find({ status: 'In Stock' }).sort({price: -1, createdAt: -1 }).toArray()
+        const result = await foodcollectionTwo.find({ status: 'In Stock' }).sort({price: -1, createdAt: -1 }).toArray()
         res.status(200).send(result)
 
       } catch (error) {
@@ -69,7 +70,7 @@ async function run() {
 
      app.get('/foods-latest', async (req, res) => {
       try {
-        const result = await foodcollection.find({ status: 'In Stock' }).sort({ createdAt: -1 }).toArray()
+        const result = await foodcollectionTwo.find({ status: 'In Stock' }).sort({ createdAt: -1 }).toArray()
         res.status(200).send(result)
 
       } catch (error) {
@@ -90,7 +91,7 @@ async function run() {
           createdAt: new Date(),
           updateAt: new Date()
         };
-        const result = await foodcollection.insertOne(newFood)
+        const result = await foodcollectionTwo.insertOne(newFood)
         res.status(200).send(result)
 
       } catch (error) {
@@ -110,7 +111,7 @@ async function run() {
           return res.status(400).send({ error: "Invalid ID" });
         }
 
-        const result = await foodcollection.findOne({ _id: new ObjectId(id) });
+        const result = await foodcollectionTwo.findOne({ _id: new ObjectId(id) });
 
         if (!result) {
           return res.status(404).send({ message: "Item not found" });
@@ -136,7 +137,7 @@ async function run() {
           createdAt: new Date(),
           updateAt: new Date()
         };
-        const result = await foodcollection.updateOne(
+        const result = await foodcollectionTwo.updateOne(
           { _id: new ObjectId(id) },
           { $set: newFood }
         );
@@ -159,7 +160,7 @@ async function run() {
         const id = req.params.id;
 
         const status = req.body
-        const result = await foodcollection.updateOne(
+        const result = await foodcollectionTwo.updateOne(
           { _id: new ObjectId(id) },
           { $set: status }
         );
@@ -179,7 +180,7 @@ async function run() {
 
     app.get('/foods-stock', async (req, res) => {
       try {
-        const result = await foodcollection.find({ status: 'Out Of Stock' }).toArray()
+        const result = await foodcollectionTwo.find({ status: 'Out Of Stock' }).toArray()
         res.status(200).send(result)
 
       } catch (error) {
@@ -195,7 +196,7 @@ async function run() {
         const id = req.params.id;
 
 
-        const result = await foodcollection.deleteOne({ _id: new ObjectId(id) });
+        const result = await foodcollectionTwo.deleteOne({ _id: new ObjectId(id) });
 
         if (result.matchedCount === 0) {
           return res.status(404).send({ message: "Item not found to update" });
