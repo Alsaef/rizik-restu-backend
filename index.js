@@ -355,7 +355,7 @@ async function run() {
     app.get('/categories', async (req, res) => {
       try {
         const result = await categoryCollection
-          .find().sort({ count: -1 })
+          .find().sort({ count: 1 })
           .toArray();
 
         res.status(200).send(result);
