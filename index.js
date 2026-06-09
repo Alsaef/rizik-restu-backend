@@ -68,6 +68,7 @@ async function run() {
 
     })
 
+  
      app.get('/foods-latest', async (req, res) => {
       try {
         const result = await foodcollectionTwo.find({ status: 'In Stock' }).sort({ createdAt: -1 }).toArray()
@@ -354,7 +355,7 @@ async function run() {
     app.get('/categories', async (req, res) => {
       try {
         const result = await categoryCollection
-          .find()
+          .find().sort({ count: -1 })
           .toArray();
 
         res.status(200).send(result);
