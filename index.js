@@ -82,25 +82,25 @@ async function run() {
     })
 
 
+app.post('/foods', async (req, res) => {
+  try {
+    const foodData = req.body;
 
-    app.post('/foods', async (req, res) => {
-      try {
+    // Direct object assembly without managing any extra lookups
+    const newFood = {
+      ...foodData,
+      createdAt: new Date(),
+      updateAt: new Date()
+    };
 
-        const foodData = req.body
-        const newFood = {
-          ...foodData,
-          createdAt: new Date(),
-          updateAt: new Date()
-        };
-        const result = await foodcollectionTwo.insertOne(newFood)
-        res.status(200).send(result)
+    const result = await foodcollectionTwo.insertOne(newFood);
+    res.status(200).send(result);
 
-      } catch (error) {
-        console.log(error.message);
-        res.status(500).send(error.message)
-      }
-
-    })
+  } catch (error) {
+    console.error("Backend Error:", error.message);
+    res.status(500).send({ message: "Internal Server Error", error: error.message });
+  }
+});
 
 
     // GET: Get item by ID
@@ -156,27 +156,36 @@ async function run() {
     });
 
 
-    app.put('/foods/:id', async (req, res) => {
-      try {
-        const id = req.params.id;
+app.patch('/foods/:id', async (req, res) => {
+  try {
+    const id = req.params.id;
+    const updateData = req.body;
 
-        const status = req.body
-        const result = await foodcollectionTwo.updateOne(
-          { _id: new ObjectId(id) },
-          { $set: status }
-        );
+    // Separate updates so we don't wipe out original creation timestamps
+    const finalUpdateValues = {
+      ...updateData,
+      updateAt: new Date() // Keep updating your changes tracking mark
+    };
 
-        if (result.matchedCount === 0) {
-          return res.status(404).send({ message: "Item not found to update" });
-        }
+    // Remove createdAt entirely if it leaks in from req.body to prevent resetting it
+    delete finalUpdateValues.createdAt;
 
-        res.status(200).send({ message: "Item Stock Update successfully" });
+    const result = await foodcollectionTwo.updateOne(
+      { _id: new ObjectId(id) },
+      { $set: finalUpdateValues }
+    );
 
-      } catch (error) {
-        console.error(error);
-        res.status(500).send({ error: error.message });
-      }
-    });
+    if (result.matchedCount === 0) {
+      return res.status(404).send({ message: "Item not found to update" });
+    }
+
+    res.send({ message: "Item updated successfully" });
+
+  } catch (error) {
+    console.error("Patch error details:", error);
+    res.status(500).send({ error: error.message });
+  }
+});
 
 
     app.get('/foods-stock', async (req, res) => {
@@ -329,28 +338,38 @@ async function run() {
 
 
 
-    app.post('/categories', async (req, res) => {
-      try {
-        const { name } = req.body;
+   app.post('/categories', async (req, res) => {
+  try {
+    const { name } = req.body;
 
-        if (!name) {
-          return res.status(400).send({ message: "Category name is required" });
-        }
+    if (!name) {
+      return res.status(400).send({ message: "Category name is required" });
+    }
 
-        // Insert data
-        const result = await categoryCollection.insertOne({
-          name,
-          createdAt: new Date()
-        });
+    // 1. Find the category with the highest count value
+    const lastCategory = await categoryCollection
+      .find({})
+      .sort({ count: -1 }) // Sort in descending order to get the highest count first
+      .limit(1)
+      .toArray();
 
-        res.status(201).send(result);
+    // 2. Calculate the next count sequence (default to 1 if the collection is empty)
+    const nextCount = lastCategory.length > 0 ? lastCategory[0].count + 1 : 1;
 
-      } catch (error) {
-        console.log(error.message);
-        res.status(500).send(error.message);
-      }
+    // 3. Insert the new document with the calculated sequential count
+    const result = await categoryCollection.insertOne({
+      name,
+      count: nextCount,
+      createdAt: new Date()
     });
 
+    res.status(201).send(result);
+
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send({ message: "Internal Server Error", error: error.message });
+  }
+});
 
     app.get('/categories', async (req, res) => {
       try {
