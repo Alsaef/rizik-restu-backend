@@ -156,7 +156,7 @@ async function run() {
     });
 
 
-    app.patch('/foods/:id', async (req, res) => {
+    app.put('/foods/:id', async (req, res) => {
       try {
         const id = req.params.id;
         const { status } = req.body;
