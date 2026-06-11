@@ -55,10 +55,10 @@ async function run() {
     const foodcollectionTwo = DB.collection('foodsTwo')
     const userCollection = DB.collection('users')
     const categoryCollection = DB.collection('category')
-    const servicesCollection=DB.collection('services')
+    const servicesCollection = DB.collection('services')
     app.get('/foods', async (req, res) => {
       try {
-        const result = await foodcollectionTwo.find({ status: 'In Stock' }).sort({price: -1, createdAt: -1 }).toArray()
+        const result = await foodcollectionTwo.find({ status: 'In Stock' }).sort({ price: -1, createdAt: -1 }).toArray()
         res.status(200).send(result)
 
       } catch (error) {
@@ -68,8 +68,8 @@ async function run() {
 
     })
 
-  
-     app.get('/foods-latest', async (req, res) => {
+
+    app.get('/foods-latest', async (req, res) => {
       try {
         const result = await foodcollectionTwo.find({ status: 'In Stock' }).sort({ createdAt: -1 }).toArray()
         res.status(200).send(result)
@@ -82,25 +82,25 @@ async function run() {
     })
 
 
-app.post('/foods', async (req, res) => {
-  try {
-    const foodData = req.body;
+    app.post('/foods', async (req, res) => {
+      try {
+        const foodData = req.body;
 
-    // Direct object assembly without managing any extra lookups
-    const newFood = {
-      ...foodData,
-      createdAt: new Date(),
-      updateAt: new Date()
-    };
+        // Direct object assembly without managing any extra lookups
+        const newFood = {
+          ...foodData,
+          createdAt: new Date(),
+          updateAt: new Date()
+        };
 
-    const result = await foodcollectionTwo.insertOne(newFood);
-    res.status(200).send(result);
+        const result = await foodcollectionTwo.insertOne(newFood);
+        res.status(200).send(result);
 
-  } catch (error) {
-    console.error("Backend Error:", error.message);
-    res.status(500).send({ message: "Internal Server Error", error: error.message });
-  }
-});
+      } catch (error) {
+        console.error("Backend Error:", error.message);
+        res.status(500).send({ message: "Internal Server Error", error: error.message });
+      }
+    });
 
 
     // GET: Get item by ID
@@ -156,36 +156,28 @@ app.post('/foods', async (req, res) => {
     });
 
 
-app.patch('/foods/:id', async (req, res) => {
-  try {
-    const id = req.params.id;
-    const updateData = req.body;
+    app.patch('/foods/:id', async (req, res) => {
+      try {
+        const id = req.params.id;
+        const { status } = req.body;
+        const result = await foodcollectionTwo.updateOne(
+          { _id: new ObjectId(id) },
+          { $set: { status, updateAt: new Date() } }
+        );
 
-    // Separate updates so we don't wipe out original creation timestamps
-    const finalUpdateValues = {
-      ...updateData,
-      updateAt: new Date() // Keep updating your changes tracking mark
-    };
+        if (result.matchedCount === 0) {
+          return res.status(404).send({ message: "Item not found to update" });
+        }
 
-    // Remove createdAt entirely if it leaks in from req.body to prevent resetting it
-    delete finalUpdateValues.createdAt;
+        res.send({ message: "Item status updated successfully" });
 
-    const result = await foodcollectionTwo.updateOne(
-      { _id: new ObjectId(id) },
-      { $set: finalUpdateValues }
-    );
+      }
 
-    if (result.matchedCount === 0) {
-      return res.status(404).send({ message: "Item not found to update" });
-    }
-
-    res.send({ message: "Item updated successfully" });
-
-  } catch (error) {
-    console.error("Patch error details:", error);
-    res.status(500).send({ error: error.message });
-  }
-});
+      catch (error) {
+        console.error("Patch error details:", error);
+        res.status(500).send({ error: error.message });
+      }
+    });
 
 
     app.get('/foods-stock', async (req, res) => {
@@ -338,38 +330,38 @@ app.patch('/foods/:id', async (req, res) => {
 
 
 
-   app.post('/categories', async (req, res) => {
-  try {
-    const { name } = req.body;
+    app.post('/categories', async (req, res) => {
+      try {
+        const { name } = req.body;
 
-    if (!name) {
-      return res.status(400).send({ message: "Category name is required" });
-    }
+        if (!name) {
+          return res.status(400).send({ message: "Category name is required" });
+        }
 
-    // 1. Find the category with the highest count value
-    const lastCategory = await categoryCollection
-      .find({})
-      .sort({ count: -1 }) // Sort in descending order to get the highest count first
-      .limit(1)
-      .toArray();
+        // 1. Find the category with the highest count value
+        const lastCategory = await categoryCollection
+          .find({})
+          .sort({ count: -1 }) // Sort in descending order to get the highest count first
+          .limit(1)
+          .toArray();
 
-    // 2. Calculate the next count sequence (default to 1 if the collection is empty)
-    const nextCount = lastCategory.length > 0 ? lastCategory[0].count + 1 : 1;
+        // 2. Calculate the next count sequence (default to 1 if the collection is empty)
+        const nextCount = lastCategory.length > 0 ? lastCategory[0].count + 1 : 1;
 
-    // 3. Insert the new document with the calculated sequential count
-    const result = await categoryCollection.insertOne({
-      name,
-      count: nextCount,
-      createdAt: new Date()
+        // 3. Insert the new document with the calculated sequential count
+        const result = await categoryCollection.insertOne({
+          name,
+          count: nextCount,
+          createdAt: new Date()
+        });
+
+        res.status(201).send(result);
+
+      } catch (error) {
+        console.error(error.message);
+        res.status(500).send({ message: "Internal Server Error", error: error.message });
+      }
     });
-
-    res.status(201).send(result);
-
-  } catch (error) {
-    console.error(error.message);
-    res.status(500).send({ message: "Internal Server Error", error: error.message });
-  }
-});
 
     app.get('/categories', async (req, res) => {
       try {
@@ -399,25 +391,25 @@ app.patch('/foods/:id', async (req, res) => {
       }
     });
 
-    app.get('/services',async(req,res)=>{
-       
-       const result=await servicesCollection.find().toArray()
-       if (!result) {
-        return res.status(404).send({message:"services not found"})
-       }
-       res.status(200).send(result)
+    app.get('/services', async (req, res) => {
+
+      const result = await servicesCollection.find().toArray()
+      if (!result) {
+        return res.status(404).send({ message: "services not found" })
+      }
+      res.status(200).send(result)
     })
 
-       app.get('/services/:id',async(req,res)=>{
-       const {id}=req.params
-       if (!id) {
-        return res.status(404).send({message:"id not found"})
-       }
-       const result=await servicesCollection.findOne({_id:new ObjectId(id)})
-       if (!result) {
-        return res.status(404).send({message:"services not found"})
-       }
-       res.status(200).send(result)
+    app.get('/services/:id', async (req, res) => {
+      const { id } = req.params
+      if (!id) {
+        return res.status(404).send({ message: "id not found" })
+      }
+      const result = await servicesCollection.findOne({ _id: new ObjectId(id) })
+      if (!result) {
+        return res.status(404).send({ message: "services not found" })
+      }
+      res.status(200).send(result)
     })
 
 
